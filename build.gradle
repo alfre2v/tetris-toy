@@ -1,0 +1,47 @@
+group 'org.alfredo.graphic.toy.tetris'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'application'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+mainClassName = 'org.alfredo.graphic.toy.tetris.App'
+
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}
+
+// jar file. See: https://www.petrikainulainen.net/programming/gradle/getting-started-with-gradle-dependency-management/
+jar {
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }  // include dependencies
+    manifest {
+        attributes (
+                'Implementation-Title': 'Tetris Toy Demo',
+                'Implementation-Version': version,
+                'Main-Class': mainClassName  // set main class !!!
+        )
+    }
+}
+
+//To publish the JAR file to local dir repo, run: gradle uploadArchives
+uploadArchives {
+    repositories {
+        flatDir {
+            dirs 'repos'
+        }
+    }
+}
+
+// to see cached dependency locations, run: gradle showMeCache
+task showMeCache << {
+    configurations.compile.each { println it }
+}
+
