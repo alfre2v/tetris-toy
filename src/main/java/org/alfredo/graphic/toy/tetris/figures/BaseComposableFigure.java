@@ -16,8 +16,6 @@ abstract public class BaseComposableFigure implements DisplayableFigure {
     public int col;
     public boolean movable;
 
-    public Game game;
-    public Grid grid;
 
     protected BaseSquare[][] group;
 
@@ -28,29 +26,30 @@ abstract public class BaseComposableFigure implements DisplayableFigure {
     /* Processing PApplet that renders all graphics */
     protected static PApplet P = TetrisPApplet.getInstance();
 
+    /* Game object */
+    protected static Game game = Game.getInstance();
+
     /* App config */
     protected static AppConfig config = AppConfig.getInstance();
 
 
-    public BaseComposableFigure(Game game, int row, int col) {
-        this.game = game;
-        this.grid = game.getGrid();
+    public BaseComposableFigure(int row, int col) {
         this.row = row;
         this.col = col;
         this.movable = true;
         this.numSquares = 0;
     }
 
-    public BaseComposableFigure(Game game, int row, int col, int colour) {
-        this(game, row, col);
-        this.color = colour;
+    public BaseComposableFigure(int row, int col, int color) {
+        this(row, col);
+        this.color = color;
     }
 
     abstract public int[][] positions();
 
     abstract public int[][] colors();
 
-    abstract public BaseSquare createSquare(Game game, int row, int col, int colour);
+    abstract public BaseSquare createSquare(int row, int col, int colour);
 
 
     public BaseSquare[][] initializeGroup() {
@@ -68,7 +67,7 @@ abstract public class BaseComposableFigure implements DisplayableFigure {
         for (int i = 0; i < dimRows; i++) {
             for (int j = 0; j < dimCols; j++) {
                 if (positions[i][j] != 0) {
-                    group[i][j] = createSquare(game, row + i, col + j, colors[i][j]);
+                    group[i][j] = createSquare(row + i, col + j, colors[i][j]);
                     numSquares++;
                 }
             }
@@ -138,7 +137,7 @@ abstract public class BaseComposableFigure implements DisplayableFigure {
                 }
             }
             row--;
-        };
+        }
     }
 
     @Override

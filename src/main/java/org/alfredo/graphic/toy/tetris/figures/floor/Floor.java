@@ -4,7 +4,6 @@ import org.alfredo.graphic.toy.tetris.*;
 import org.alfredo.graphic.toy.tetris.constants.Move;
 import org.alfredo.graphic.toy.tetris.figures.BaseComposableFigure;
 import org.alfredo.graphic.toy.tetris.squares.BaseSquare;
-import processing.core.PApplet;
 
 import java.util.*;
 
@@ -21,6 +20,9 @@ public class Floor implements List<ComposableFloorLine>, Displayable {
 
     /* Processing PApplet that renders all graphics */
     protected static TetrisPApplet P = TetrisPApplet.getInstance();
+
+    /* Game class */
+    protected static Game game = Game.getInstance();
 
     /* App config */
     protected static AppConfig config = AppConfig.getInstance();
@@ -245,7 +247,6 @@ public class Floor implements List<ComposableFloorLine>, Displayable {
             for (int i=0; i < numNewRows; i++)
                 this.add(
                         new ComposableFloorLine(
-                                TetrisPApplet.getGame(),
                                 floorTopRow - i - 1,
                                 0
                         )
@@ -312,7 +313,7 @@ public class Floor implements List<ComposableFloorLine>, Displayable {
     // remove all full lines
 
     public void removeFullLines() {
-        Score score = TetrisPApplet.getGame().getScore();
+        Score score = game.getScore();
         int n = floorLines.size();
 
         for (int i=n-1; i>=0; i--) {

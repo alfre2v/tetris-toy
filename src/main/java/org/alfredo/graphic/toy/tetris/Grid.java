@@ -8,6 +8,8 @@ public class Grid {
     public int x0, y0;
     public int x1, y1;
 
+    public int width, height;
+
     public int squareWidth;
     public int squareHeight;
 
@@ -16,6 +18,9 @@ public class Grid {
         this.y0 = y0;
         this.x1 = x1;
         this.y1 = y1;
+        this.width = Math.abs(x1 - x0);
+        this.height = Math.abs(y1 - y0);
+
         this.rows = rows;
         this.cols = cols;
 

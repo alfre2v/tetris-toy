@@ -11,22 +11,21 @@ abstract public class BaseSquare implements DisplayableFigure {
     public int row;
     public int col;
     public boolean movable;
-    public Grid grid;
 
     public String name;
 
-    protected Game game;
 
     /* Processing PApplet that renders all graphics */
     protected static PApplet P = TetrisPApplet.getInstance();
+
+    /* Game object */
+    protected static Game game = Game.getInstance();
 
     /* App config */
     protected static AppConfig config = AppConfig.getInstance();
 
 
-    public BaseSquare(Game game, int row, int col, int colour) {
-        this.game = game;
-        this.grid = game.getGrid();
+    public BaseSquare(int row, int col, int colour) {
         this.row = row;
         this.col = col;
         this.colour = colour;

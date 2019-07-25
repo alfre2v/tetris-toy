@@ -13,7 +13,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-
+/**
+ * Class that encapsulates top Game logic
+ */
 public class Game implements Displayable {
 
     private Move curMove;
@@ -38,6 +40,7 @@ public class Game implements Displayable {
 
     private double timeLastAdvance = currentTimeSeconds();
     private double timeLastArrowPressed = 0;
+    private double timeTextStart = 0;
 
     private Map<State, Double> timeByState = new HashMap<>();
 
@@ -48,8 +51,14 @@ public class Game implements Displayable {
     /* App config */
     private static AppConfig config = AppConfig.getInstance();
 
-    public Game() {
+    /* instance of this class */
+    private static Game instance = null;
 
+    /**
+     * Setup the Game
+     * Ideally called from Processing PApplet setup method
+     */
+    public void gameSetup() {
         curMove = Move.NONE;
         curRotation = Rotation.NONE;
         curInversion = 0;
@@ -74,9 +83,9 @@ public class Game implements Displayable {
 
         floor = new Floor();
 
-        state = State.BEFORE_FIGURE;
-
+        state = State.INITIAL_TEXT;
     }
+
 
 
     private BaseComposableFigure createRandomFigure() {
@@ -91,15 +100,15 @@ public class Game implements Displayable {
         BaseComposableFigure fig = null;
 
         if (figNum == 0)
-            fig = new ComposableBox(this, 0, col);
+            fig = new ComposableBox(0, col);
         else if (figNum == 1)
-            fig = new ComposableI(this, 0, col);
+            fig = new ComposableI(0, col);
         else if (figNum == 2)
-            fig = new ComposableL(this, 0, col);
+            fig = new ComposableL(0, col);
         else if (figNum == 3)
-            fig = new ComposableS(this, 0, col);
+            fig = new ComposableS(0, col);
         else if (figNum == 4)
-            fig = new ComposableT(this, 0, col);
+            fig = new ComposableT(0, col);
         else
             throw new IrrecoverableError("Some figure missing in random creation logic");
 
@@ -125,15 +134,57 @@ public class Game implements Displayable {
         return State.CREATE_FIGURE;
     }
 
+    public State showInitialText(State state) {
+        if (state != State.INITIAL_TEXT) return state;
+
+        // TODO: implement a text box with some info about the game
+
+        if (timeTextStart == 0) timeTextStart = currentTimeSeconds();
+
+        double curTime = currentTimeSeconds();
+        if (curTime - timeTextStart < config.TIME_SHOW_TEXT) {
+
+            // TODO: move Text drawing to separate class
+
+            P.rectMode(P.CORNER);
+            P.textSize(30);  // TODO: Text size to config param
+            P.fill(0, 102, 173);
+            int mar = 50;  // margin between background border and text
+            P.text(config.TEXT_WELCOME, grid.x0 + mar, grid.y0 + mar, grid.width - 2*mar, grid.height/2 - 2*mar);  // Text wraps within text box
+
+            P.textSize(22);  // TODO: Text size to config param
+            P.fill(0, 102, 153);
+            P.text(config.TEXT_AUTHOR, grid.x0 + mar, grid.y0 + grid.height/2 + mar, grid.width - 2*mar, grid.height/2 - 2*mar);  // Text wraps within text box
+
+            return State.INITIAL_TEXT;
+        }
+
+        return State.BEFORE_FIGURE;
+    }
+
+    public State showGameOverText(State state) {
+        if (state != State.GAME_OVER) return state;
+
+        // FIXME: Text is drawn behind the squares, so it cant be seen.
+
+        P.rectMode(P.CORNER);
+        P.textSize(32);  // TODO: Text size to config param
+        P.fill(0, 102, 173);
+        int mar = 50;  // margin between background border and text
+        P.text(config.TEXT_GAMEOVER, grid.x0 + mar, grid.y0 + mar, grid.width - 2*mar, grid.height/2 - 2*mar);  // Text wraps within text box
+
+        return State.GAME_OVER;
+    }
+
     public State cleanAfterFigure(State state) {
-        if (state != State.FINAL_STATE) return state;
+        if (state != State.AFTER_FIGURE) return state;
         // clearInteractionTrackingVars();
         return State.BEFORE_FIGURE;
     }
 
     /**
      * Create a new figure positioned on top (row=0, random col).
-     * Should randomly pick the type of figure to create, color,
+     * Randomly picks the type of figure to create, color,
      * number of rotations and inversions to apply to it.
      *
      * @return Next game state
@@ -151,7 +202,23 @@ public class Game implements Displayable {
         }
 
         if (figures.isEmpty()) {
-            figures.add(createRandomFigure());
+
+            // TODO: check for end of game condition
+            // 1. check if it's possible to position this figure in the floor (collisions?)
+            // 2. If this is collision, try to generate N more figures and try again
+            // 3. If after N attempts we cannot place the figure then GAME OVER
+
+            BaseComposableFigure fig = null;
+
+            for (int i=0; i<10; i++) {
+                fig = createRandomFigure();
+                if (floor.canFit(fig)) break;
+                else fig = null;
+            }
+
+            if (fig == null) return State.GAME_OVER;
+
+            figures.add(fig);
         }
 
         clearInteractionTrackingVars();
@@ -200,23 +267,15 @@ public class Game implements Displayable {
 
             // move figure
             if (f.isMovable()) {
-                // work around the long delay for repeated keys events
-                double curTime = currentTimeSeconds();
-                if (curMove == Move.NONE) {
-                    if (curTime - timeLastArrowPressed >= config.TIME_ARROW_REPEAT) {
-                        if (isLeftKeyPressed()) curMove = Move.LEFT;
-                        if (isRightKeyPressed()) curMove = Move.RIGHT;
-                        if (curMove != Move.NONE) timeLastArrowPressed = curTime;
-                    }
-                }
-                else timeLastArrowPressed = curTime;
+                // alternative way to Move (work around slow events)
+                updateCurrentMoveArrowPressed();
+
                 // check floor, do not perform move if collision
                 if (floor.canMove(f, curMove))
                     f.move(curMove);
             }
 
             // mirror invert figure: test only
-            // TODO: reverse inversion if inverted figure does not fit in floor
             if (curInversion == 1) {
                 f.mirrorInvert();
             }
@@ -262,16 +321,11 @@ public class Game implements Displayable {
             floor.removeFullLines();
         }
 
-        return State.FINAL_STATE;
+        return State.AFTER_FIGURE;
     }
 
-//    public int periodicReport(int state) {
-//        // TODO: report score every 30 seconds
-//        if (state != 2) return state;
-//    }
-
-
     public void gameLogic() {
+        state = showInitialText(state);
         state = initBeforeFigure(state);
         state = spawnNewFigure(state);
         state = respondToUserInput(state);
@@ -279,8 +333,8 @@ public class Game implements Displayable {
         state = animateFallToFloor(state);
         state = mergeFigureToFloorASAP(state);
         state = cleanAfterFigure(state);
+        state = showGameOverText(state);
     }
-
 
     public void clearInteractionTrackingVars() {
         curMove = Move.NONE;
@@ -335,6 +389,8 @@ public class Game implements Displayable {
 
     public void display() {
 
+        // TODO: rename method to game_loop and move the call to setBackground inside here
+
         gameLogic();
 
         // paint movable figures (there is only one in this game)
@@ -360,6 +416,19 @@ public class Game implements Displayable {
             return ((P.key == P.CODED) && (P.keyCode == P.RIGHT));
         }
         return false;
+    }
+
+    private void updateCurrentMoveArrowPressed() {
+        // work around the long delay for repeated keys events
+        double curTime = currentTimeSeconds();
+        if (curMove == Move.NONE) {
+            if (curTime - timeLastArrowPressed >= config.TIME_ARROW_REPEAT) {
+                if (isLeftKeyPressed()) curMove = Move.LEFT;
+                if (isRightKeyPressed()) curMove = Move.RIGHT;
+                if (curMove != Move.NONE) timeLastArrowPressed = curTime;
+            }
+        }
+        else timeLastArrowPressed = curTime;
     }
 
     /* Events */
@@ -396,6 +465,13 @@ public class Game implements Displayable {
 
     public Score getScore() {
         return score;
+    }
+
+    public static Game getInstance() {
+        if (instance == null) {
+            instance = new Game();
+        }
+        return instance;
     }
 
 }

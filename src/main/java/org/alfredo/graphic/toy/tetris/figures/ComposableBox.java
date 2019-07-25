@@ -1,7 +1,6 @@
 package org.alfredo.graphic.toy.tetris.figures;
 
 import org.alfredo.graphic.toy.tetris.squares.BaseSquare;
-import org.alfredo.graphic.toy.tetris.Game;
 import org.alfredo.graphic.toy.tetris.squares.SimpleSquare;
 
 public class ComposableBox extends BaseComposableFigure {
@@ -17,8 +16,8 @@ public class ComposableBox extends BaseComposableFigure {
     };
 
 
-    public ComposableBox(Game game, int row, int col) {
-        super(game, row, col);
+    public ComposableBox(int row, int col) {
+        super(row, col);
         initializeGroup();
     }
 
@@ -33,8 +32,8 @@ public class ComposableBox extends BaseComposableFigure {
     }
 
     @Override
-    public BaseSquare createSquare(Game game, int row, int col, int colour) {
-        return new SimpleSquare(game, row, col, colour);
+    public BaseSquare createSquare(int row, int col, int colour) {
+        return new SimpleSquare(row, col, colour);
     }
 
 }

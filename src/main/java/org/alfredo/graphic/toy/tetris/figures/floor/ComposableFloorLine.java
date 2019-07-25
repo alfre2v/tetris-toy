@@ -1,6 +1,5 @@
 package org.alfredo.graphic.toy.tetris.figures.floor;
 
-import org.alfredo.graphic.toy.tetris.Game;
 import org.alfredo.graphic.toy.tetris.errors.IrrecoverableError;
 import org.alfredo.graphic.toy.tetris.figures.BaseComposableFigure;
 import org.alfredo.graphic.toy.tetris.squares.BaseSquare;
@@ -13,8 +12,8 @@ public class ComposableFloorLine extends BaseComposableFigure {
     private int[][] colors;
 
 
-    public ComposableFloorLine(Game game, int row, int col) {
-        super(game, row, 0);
+    public ComposableFloorLine(int row, int col) {
+        super(row, 0);
 
         int dimRows = 1;
         int dimCols = config.NUM_COLS;
@@ -36,8 +35,8 @@ public class ComposableFloorLine extends BaseComposableFigure {
     }
 
     @Override
-    public BaseSquare createSquare(Game game, int row, int col, int colour) {
-        return new SimpleSquare(game, row, col, colour);
+    public BaseSquare createSquare(int row, int col, int colour) {
+        return new SimpleSquare(row, col, colour);
     }
 
     /**

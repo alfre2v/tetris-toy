@@ -33,6 +33,7 @@ public class TetrisBackground implements Displayable {
     private void drawTopWall() {
         P.noStroke();
         P.fill(topWallColor);
+        P.rectMode(P.CORNER);
         P.rect(0, 0, screenWidth, topWallWidth);
     }
 
@@ -41,6 +42,7 @@ public class TetrisBackground implements Displayable {
         P.translate(0, screenHeight - bottomWallWidth);
         P.noStroke();
         P.fill(bottomWallColor);
+        P.rectMode(P.CORNER);
         P.rect(0, 0, screenWidth, bottomWallWidth);
         P.popMatrix();
     }
@@ -48,16 +50,16 @@ public class TetrisBackground implements Displayable {
     private void drawLeftWall() {
         P.noStroke();
         P.fill(leftWallColor);
+        P.rectMode(P.CORNER);
         P.rect(0, topWallWidth, leftWallWidth, screenHeight - topWallWidth - bottomWallWidth);
     }
 
     private void drawRightWall() {
         P.pushMatrix();
-
         P.translate(screenWidth - leftWallWidth, 0);
-
         P.noStroke();
         P.fill(rightWallColor);
+        P.rectMode(P.CORNER);
         P.rect(0, topWallWidth, rightWallWidth, screenHeight - topWallWidth - bottomWallWidth);
 
         P.popMatrix();

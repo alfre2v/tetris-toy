@@ -7,13 +7,14 @@ The code repo is: https://github.com/alfre2v/tetris-toy
 ## Author
 
 Alfredo Valles Valdes
+
 My Github: https://github.com/alfre2v
+
 email: {my first name} {dot} valles {at} gmail.com
 
 ## License
 
-This work is distributed under the GNU GENERAL PUBLIC LICENSE Version 3
-Refer to file LICENSE
+This work is distributed under the GNU GENERAL PUBLIC LICENSE Version 3. Please refer to file LICENSE.
 
 ## Why coding a Tetris Game in Java?
 

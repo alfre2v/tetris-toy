@@ -15,8 +15,8 @@ public class ComposableI extends BaseComposableFigure {
     };
 
 
-    public ComposableI(Game game, int row, int col) {
-        super(game, row, col);
+    public ComposableI(int row, int col) {
+        super(row, col);
         initializeGroup();
     }
 
@@ -31,8 +31,8 @@ public class ComposableI extends BaseComposableFigure {
     }
 
     @Override
-    public BaseSquare createSquare(Game game, int row, int col, int colour) {
-        return new SimpleSquare(game, row, col, colour);
+    public BaseSquare createSquare(int row, int col, int colour) {
+        return new SimpleSquare(row, col, colour);
     }
 
 }
